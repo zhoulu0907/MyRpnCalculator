@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context-3.2.xsd
+      http://www.springframework.org/schema/aop
+      http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+      http://www.springframework.org/schema/tx
+      http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+      http://www.springframework.org/schema/mvc
+      http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+      ">
+      
+      
+	<bean id="Ignite" class="org.apache.ignite.IgniteSpringBean" lazy-init="false">
+	     <property name="configuration">
+	         <bean id="ignite.cfg" class="org.apache.ignite.configuration.IgniteConfiguration">
+	             <property name="clientMode" value="${ignite.clientmode:true}"/>
+	             <property name="peerClassLoadingEnabled" value="true"/>
+	             
+			     <property name="discoverySpi">
+			        <bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
+			            <property name="ipFinder">
+			                <bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.multicast.TcpDiscoveryMulticastIpFinder">
+                        <property name="addresses">
+                            <list>
+                                <!-- In distributed environment, replace with actual host IP address. -->
+                                <value>127.0.0.1:47500..47509</value>
+                            </list>
+                        </property>
+                    </bean>
+			            </property>
+			        </bean>
+			     </property>
+	         </bean>
+	     </property>
+	 </bean>
+ 
+
+</beans>
