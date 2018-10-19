@@ -1,6 +1,8 @@
 package my.rpn.calculator.runner;
 
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
@@ -11,7 +13,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import my.rpn.calculator.constant.CommandConstant;
+import my.rpn.calculator.constant.Constant;
 import my.rpn.calculator.utils.IgniteUtils;
 
 @Component
@@ -20,6 +22,8 @@ public class DataInput implements CommandLineRunner {
 	
 	@Resource
 	private IgniteUtils igniteUtils;
+	
+	private Pattern pattern = Pattern.compile(Constant.NUMBERS_PATTERN);
 
 	@Override
 	public void run(String... arg0) throws Exception {
@@ -37,22 +41,25 @@ public class DataInput implements CommandLineRunner {
 					String line = sc.nextLine();
 					String[] words = line.split("\\s+");
 					for (String word : words) {
-						//TBD异常校验
-						if (word.equals(" ")) {
-							continue;
-						}
-						if (word.toLowerCase().equals(CommandConstant.EXIT)) {
+						if (word.toLowerCase().equals(Constant.EXIT)) {
 							sc.close();
 							ignite.close();
 							System.exit(0);
 						}
-						if (word.toLowerCase().equals(CommandConstant.SQRT)) {
-							word = "~";
+						if (word.toLowerCase().equals(Constant.SQRT)) {
+							wordQueue.add("~");
+							continue;
 						}
-						if (word.toLowerCase().equals(CommandConstant.UNDO)) {
-							word = "<";
+						if (word.toLowerCase().equals(Constant.UNDO)) {
+							wordQueue.add("<");
+							continue;
 						}
-						wordQueue.add(word);
+						if (word.toLowerCase().equals(Constant.CLEAR)
+							|| Constant.OPERATOR.contains(word)
+							|| pattern.matcher(word).matches()) {
+							wordQueue.add(word);
+							continue;
+						}
 					}
 					wordQueue.add("end");
 				}

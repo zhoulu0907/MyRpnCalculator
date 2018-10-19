@@ -1,5 +1,7 @@
 package my.rpn.calculator.runner;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Stack;
 
 import javax.annotation.Resource;
@@ -15,7 +17,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import my.rpn.calculator.constant.CommandConstant;
+import my.rpn.calculator.constant.Constant;
 import my.rpn.calculator.utils.IgniteUtils;
 
 @Component
@@ -40,24 +42,32 @@ public class RpnCalculator implements CommandLineRunner{
 				// TODO Auto-generated method stub
 				while(true) {
 					String word = wordQueue.take();
-					if (CommandConstant.OPERATOR.contains(word)) {
-					    int a = Integer.valueOf(stack.pop());    
-					    int b = Integer.valueOf(stack.pop());    
+					if (Constant.OPERATOR.contains(word)) {
+						BigDecimal a = BigDecimal.valueOf(Double.parseDouble(stack.pop()));
+						BigDecimal b = BigDecimal.valueOf(Double.parseDouble(stack.pop()));
+						BigDecimal r = null;
+						
 					    switch (word) {
-					    	case "+":     
-					    		stack.push(String.valueOf(a + b));
+					    	case "+":
+								r = a.add(b).setScale(10, BigDecimal.ROUND_HALF_DOWN);
+								stack.push(""+r.doubleValue());
 					    		break;    
-					    	case "-":     
-					    		stack.push(String.valueOf(b - a));
+					    	case "-":
+								r = b.subtract(a).setScale(10, BigDecimal.ROUND_HALF_DOWN);
+								stack.push(""+r.doubleValue());
 					    		break;
 					    	case "*":
-					    		stack.push(String.valueOf(a * b));
+								r = a.multiply(b).setScale(10, BigDecimal.ROUND_HALF_DOWN);
+								stack.push(""+r.doubleValue());
 					    		break;    
-					    	case "/":     
-					    		stack.push(String.valueOf(b / a));
+					    	case "/":
+								r = b.divide(a).setScale(10, BigDecimal.ROUND_HALF_DOWN);
+								stack.push(""+r.doubleValue());
 					    		break;   
 			    		}
-					}else if(CommandConstant.LINEEND.equals(word)) {
+					}else if (Constant.CLEAR.equals(word)){
+						stack.clear();
+					}else if(Constant.LINEEND.equals(word)) {
 						for (String s : stack) {
 							System.out.print(s + " ");
 						}
