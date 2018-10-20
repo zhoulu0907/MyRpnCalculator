@@ -17,6 +17,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
 import my.rpn.calculator.constant.Constant;
 import my.rpn.calculator.utils.IgniteUtils;
 
@@ -38,11 +39,31 @@ public class RpnCalculator implements CommandLineRunner{
 		new Thread(new Runnable() {
 			
 			@Override
-			public void run() {
+			public void run(){
 				// TODO Auto-generated method stub
 				while(true) {
 					String word = wordQueue.take();
 					if (Constant.OPERATOR.contains(word)) {
+						if (stack.empty()) {
+							
+							System.out.println("operator <operator> (position: <pos>): insufficient parameters");
+
+							for (String s : stack) {
+								System.out.print(s + " ");
+							}
+							System.out.println();
+							System.exit(0);
+						}
+						if (word.equals("~")) {
+							double dVal = Math.sqrt(Double.parseDouble(stack.pop()));
+				    		BigDecimal v = new BigDecimal(dVal).setScale(10, BigDecimal.ROUND_HALF_DOWN);
+				    		stack.push(""+v.doubleValue());
+				    		continue;
+						}
+						if (word.equals("<")) {
+				    		stack.pop();
+				    		continue;
+						}
 						BigDecimal a = BigDecimal.valueOf(Double.parseDouble(stack.pop()));
 						BigDecimal b = BigDecimal.valueOf(Double.parseDouble(stack.pop()));
 						BigDecimal r = null;
@@ -63,7 +84,9 @@ public class RpnCalculator implements CommandLineRunner{
 					    	case "/":
 								r = b.divide(a).setScale(10, BigDecimal.ROUND_HALF_DOWN);
 								stack.push(""+r.doubleValue());
-					    		break;   
+					    		break;
+					    	case "~":
+					    		
 			    		}
 					}else if (Constant.CLEAR.equals(word)){
 						stack.clear();
